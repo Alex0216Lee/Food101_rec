@@ -56,6 +56,21 @@ def get_nr():
     data = list(collection_nr.find({}, {"_id": 0}))
     return jsonify(data)
 
+@app.route('/test_db', methods=['GET'])
+def test_db():
+    try:
+        # 插入測試資料到 DHR 集合
+        test_data = {"status": "success", "message": "Test data inserted"}
+        result = collection_dhr.insert_one(test_data)
+
+        # 從集合中查詢剛插入的資料
+        inserted_data = collection_dhr.find_one({"_id": result.inserted_id}, {"_id": 0})
+        return jsonify({"status": "connected", "data": inserted_data})
+    except Exception as e:
+        # 如果出錯，返回錯誤訊息
+        return jsonify({"status": "error", "message": str(e)})
+
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
