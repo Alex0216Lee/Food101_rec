@@ -4,7 +4,7 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 # 連接到 MongoDB (替換為你的 MongoDB URI)
-MONGO_URI = "mongodb+srv://aleee:foodproject@cluster0.gucwp.mongodb.net/sample_mflix?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=false"
+MONGO_URI = "mongodb+srv://aleee:foodproject@cluster0.gucwp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(MONGO_URI)
 
 # 指定資料庫和集合
