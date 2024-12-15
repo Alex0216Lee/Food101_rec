@@ -56,19 +56,33 @@ def get_nr():
     data = list(collection_nr.find({}, {"_id": 0}))
     return jsonify(data)
 
-@app.route('/test_db', methods=['GET'])
+@app.route('/test_db', methods=['POST'])
 def test_db():
     try:
-        # 插入測試資料到 DHR 集合
-        test_data = {"status": "success", "message": "Test data inserted"}
+        # 驗證請求是否包含 JSON 數據
+        if not request.is_json:
+            return jsonify({"status": "error", "message": "Request data must be in JSON format"}), 400
+
+        # 獲取請求的 JSON 數據
+        test_data = request.json
+
+        # 檢查必需的字段
+        required_fields = ["status", "message"]
+        for field in required_fields:
+            if field not in test_data:
+                return jsonify({"status": "error", "message": f"Missing required field: {field}"}), 400
+
+        # 插入測試數據到 DHR 集合
         result = collection_dhr.insert_one(test_data)
 
-        # 從集合中查詢剛插入的資料
+        # 從集合中查詢剛插入的數據
         inserted_data = collection_dhr.find_one({"_id": result.inserted_id}, {"_id": 0})
-        return jsonify({"status": "connected", "data": inserted_data})
+
+        return jsonify({"status": "connected", "data": inserted_data}), 201  # 201 表示已創建
     except Exception as e:
         # 如果出錯，返回錯誤訊息
-        return jsonify({"status": "error", "message": str(e)})
+        return jsonify({"status": "error", "message": str(e)}), 500  # 500 表示伺服器錯誤
+
 
 
 if __name__ == '__main__':
