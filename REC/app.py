@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
 # 連接到 MongoDB (替換為你的 MongoDB URI)
-MONGO_URI = "mongodb+srv://aleee:foodproject@cluster0.gucwp.mongodb.net/"
+MONGO_URI = "mongodb+srv://aleee:foodproject@cluster0.gucwp.mongodb.net/?retryWrites=true&w=majority&ssl=true"
 client = MongoClient(MONGO_URI)
 
 # 指定資料庫和集合
@@ -60,14 +62,20 @@ def get_nr():
 def search_dhr():
     if request.method == 'POST':
         title = request.form.get('title')  # 獲取使用者輸入的 title
+        logging.debug(f"Received title: {title}")  # 紀錄收到的 title
         if not title:
             return render_template('homepage.html', error="請輸入標題！")
         
-        data = collection_dhr.find_one({"title": title}, {"_id": 0})  # 查詢資料
-        if data:
-            return render_template('homepage.html', data=data, title=title)
-        else:
-            return render_template('homepage.html', error="找不到該標題的資料！")
+        try:
+            data = collection_dhr.find_one({"title": title}, {"_id": 0})  # 查詢 MongoDB
+            logging.debug(f"MongoDB query result: {data}")  # 紀錄查詢結果
+            if data:
+                return render_template('homepage.html', data=data, title=title)
+            else:
+                return render_template('homepage.html', error="找不到該標題的資料！")
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")  # 記錄錯誤
+            return render_template('homepage.html', error=f"伺服器錯誤: {str(e)}")
     
     return render_template('homepage.html')
 
