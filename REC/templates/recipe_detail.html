@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>詳細食譜</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='detail.css') }}">
+</head>
+<body>
+    <h1>{{ recipe.original.title }}</h1>
+
+    <!-- 顯示原始食譜 -->
+    <h3>Ingredients (Original):</h3>
+    <ul>
+        {% for ingredient in recipe.original.ingredients %}
+            <li>{{ ingredient }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Directions (Original):</h3>
+    <ol>
+        {% for direction in recipe.original.directions %}
+            <li>{{ direction }}</li>
+        {% endfor %}
+    </ol>
+
+    <!-- 顯示健康食譜，如果存在 -->
+    {% if recipe.healthy %}
+        <hr>
+        <h2>Healthier Version</h2>
+        <h3>Ingredients (Healthy):</h3>
+        <ul>
+            {% for ingredient in recipe.healthy.ingredients %}
+                <li>{{ ingredient }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Directions (Healthy):</h3>
+        <ol>
+            {% for direction in recipe.healthy.directions %}
+                <li>{{ direction }}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p>No healthier version available.</p>
+    {% endif %}
+
+    <div class="back-button">
+        <button onclick="window.location.href='/'">返回上一頁</button>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,119 @@
+/* 基本樣式重置 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* 容器樣式 */
+body {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* 標題樣式 */
+h1 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 2em;
+    color: #27ae60;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #27ae60;
+    padding-bottom: 5px;
+}
+
+h3 {
+    font-size: 1.5em;
+    color: #2980b9;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-left: 4px solid #2980b9;
+    padding-left: 10px;
+}
+
+/* 清單樣式 */
+ul, ol {
+    padding-left: 20px;
+}
+
+li {
+    margin: 10px 0;
+    font-size: 1.1em;
+    color: #555;
+    list-style: circle;
+}
+
+/* 分隔線樣式 */
+hr {
+    border: none;
+    height: 1px;
+    background-color: #ccc;
+    margin: 30px 0;
+}
+
+/* 沒有健康版本時的段落樣式 */
+p {
+    font-size: 1.2em;
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* 返回按鈕樣式 */
+.back-button {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-button button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.back-button button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+
+/* 回應式設計 */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    h3 {
+        font-size: 1.3em;
+    }
+
+    li {
+        font-size: 1em;
+    }
+}

@@ -1,30 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search DHR</title>
+    <title>深度學習食譜推薦系統</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='homepage.css') }}">
 </head>
 <body>
-    <h1>搜尋 DHR 資料表</h1>
-    <form method="POST" action="{{ url_for('search_dhr') }}">
-        <label for="title">輸入標題：</label>
-        <input type="text" id="title" name="title" required>
-        <button type="submit">搜尋</button>
-    </form>
-    <hr>
+    <div class="container">
+        <!-- 標題區 -->
+        <div class="header">
+            <h1>深度學習食譜推薦系統</h1>
+            <p class="subtitle">BASED ON DATASET FOOD 101</p>
+        </div>
 
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
+        <!-- 搜尋框區域 -->
+        <div class="search-section">
+            <input type="text" placeholder="輸入菜名：（獲得食譜成份、步驟）" id="search-input">
+            <button id="search-button">🔎</button>
+        </div>
 
-    {% if data %}
-        <h2>搜尋結果：</h2>
-        <ul>
-            {% for key, value in data.items() %}
-                <li><strong>{{ key }}:</strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        <!-- 搜尋結果區域 -->
+        <div id="search-results" class="search-results-section"></div>
+
+        <!-- 圖片上傳區域 -->
+        <div class="upload-section">
+            <label for="upload-input" class="upload-label">
+                上傳圖片辨識
+                <span class="upload-icon">⤴️</span>
+            </label>
+            <input type="file" id="upload-input" accept="image/*">
+        </div>
+
+        <!-- 圖片預覽區域 -->
+        <div id="image-preview" class="image-preview-section"></div>
+
+        <!-- 確定和取消按鈕 -->
+        <div id="image-buttons" class="image-buttons-section" style="display: none;">
+            <button id="confirm-upload">確定上傳</button>
+            <button id="cancel-upload">取消重新上傳</button>
+        </div>
+         <!-- 搜尋結果區域 -->
+         <div id="transformer-results" class="transformer-results-section"></div>
+    </div>
+
+    <!-- 引入 JavaScript -->
+    <script src="{{ url_for('static', filename='homepage.js') }}" defer></script>
 </body>
 </html>
