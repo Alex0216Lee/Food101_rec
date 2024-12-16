@@ -1,0 +1,167 @@
+/* 全局樣式 */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8fafe;
+    color: #333;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* 容器 */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* 標題樣式 */
+.header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    color: #34495e;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* 搜尋框樣式 */
+.search-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+#search-input {
+    width: 75%;
+    padding: 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 10px 0 0 10px;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+}
+
+#search-input:focus {
+    border-color: #3498db;
+}
+
+#search-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+#search-button:hover {
+    background-color: #2980b9;
+}
+
+/* 搜尋結果區域 */
+.search-results-section {
+    margin-top: 20px;
+    text-align: left;
+    border: 1px solid #ecf0f1;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 50px;
+    color: #2c3e50;
+}
+
+/* 上傳圖片樣式 */
+.upload-section {
+    margin-top: 30px;
+}
+
+.upload-label {
+    display: inline-block;
+    background-color: #ecf0f1;
+    padding: 12px 25px;
+    border: 1px solid #bdc3c7;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.upload-label:hover {
+    background-color: #d5d8dc;
+    transform: scale(1.05);
+}
+
+.upload-icon {
+    margin-left: 8px;
+}
+
+#upload-input {
+    display: none;
+}
+
+/* 圖片預覽區域 */
+.image-preview-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.image-preview-section img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #bdc3c7;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 確定與取消按鈕樣式 */
+.image-buttons-section button {
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.image-buttons-section button:hover {
+    background-color: #34495e;
+    transform: scale(1.05);
+}
+
+#cancel-upload {
+    background-color: #e74c3c;
+}
+
+#cancel-upload:hover {
+    background-color: #c0392b;
+}
+
+/* 搜尋結果區域 */
+.transformer-results-section {
+    margin-top: 20px;
+    text-align: left;
+    border: 1px solid #ecf0f1;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 50px;
+    color: #2c3e50;
+}

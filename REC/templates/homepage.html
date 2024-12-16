@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search DHR</title>
+</head>
+<body>
+    <h1>搜尋 DHR 資料表</h1>
+    <form method="POST" action="{{ url_for('search_dhr') }}">
+        <label for="title">輸入標題：</label>
+        <input type="text" id="title" name="title" required>
+        <button type="submit">搜尋</button>
+    </form>
+    <hr>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if data %}
+        <h2>搜尋結果：</h2>
+        <ul>
+            {% for key, value in data.items() %}
+                <li><strong>{{ key }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

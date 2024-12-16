@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -56,34 +56,20 @@ def get_nr():
     data = list(collection_nr.find({}, {"_id": 0}))
     return jsonify(data)
 
-@app.route('/test_db', methods=['POST'])
-def test_db():
-    try:
-        # 驗證請求是否包含 JSON 數據
-        if not request.is_json:
-            return jsonify({"status": "error", "message": "Request data must be in JSON format"}), 400
-
-        # 獲取請求的 JSON 數據
-        test_data = request.json
-
-        # 檢查必需的字段
-        required_fields = ["status", "message"]
-        for field in required_fields:
-            if field not in test_data:
-                return jsonify({"status": "error", "message": f"Missing required field: {field}"}), 400
-
-        # 插入測試數據到 DHR 集合
-        result = collection_dhr.insert_one(test_data)
-
-        # 從集合中查詢剛插入的數據
-        inserted_data = collection_dhr.find_one({"_id": result.inserted_id}, {"_id": 0})
-
-        return jsonify({"status": "connected", "data": inserted_data}), 201  # 201 表示已創建
-    except Exception as e:
-        # 如果出錯，返回錯誤訊息
-        return jsonify({"status": "error", "message": str(e)}), 500  # 500 表示伺服器錯誤
-
-
+@app.route('/search_dhr', methods=['GET', 'POST'])
+def search_dhr():
+    if request.method == 'POST':
+        title = request.form.get('title')  # 獲取使用者輸入的 title
+        if not title:
+            return render_template('homepage.html', error="請輸入標題！")
+        
+        data = collection_dhr.find_one({"title": title}, {"_id": 0})  # 查詢資料
+        if data:
+            return render_template('homepage.html', data=data, title=title)
+        else:
+            return render_template('homepage.html', error="找不到該標題的資料！")
+    
+    return render_template('homepage.html')
 
 if __name__ == '__main__':
     import os
