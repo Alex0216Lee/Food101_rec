@@ -179,6 +179,8 @@ def ensure_model_exists():
     if not model_path.exists():
         print("模型檔案不存在，開始下載...")
         download_model()
+    else:
+        print(f"模型檔案已存在於 {model_path}")
     return str(model_path)
 
 def download_model():
