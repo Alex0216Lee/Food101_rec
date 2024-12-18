@@ -8,8 +8,11 @@ from torchvision import transforms
 import os
 from flask_cors import CORS
 import timm
+import requests
+from pathlib import Path
+from tqdm import tqdm
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 CORS(app)
@@ -23,6 +26,22 @@ db = client['sample_mflix']
 collection_dhr = db['DHR']
 collection_hr = db['HR']
 collection_nr = db['NR']
+
+# url = "https://weiweihsu-my.sharepoint.com/:u:/g/personal/best_weiweihsu_onmicrosoft_com/EV14Df_TOEpGtp4z7Xh5NrAB7dqUsHUyggBk8sgk4oLgzA?download=1"
+
+# output_file = "swin_model_disb.pth"
+# try:
+#     # 發送 GET 請求並下載檔案
+#     response = requests.get(url, stream=True)
+#     response.raise_for_status()  # 檢查請求是否成功
+
+#     # 將內容寫入本地檔案
+#     with open(output_file, "wb") as file:
+#         for chunk in response.iter_content(chunk_size=8192):  # 分塊寫入檔案
+#             file.write(chunk)
+#     print(f"檔案已成功儲存為 {output_file}")
+# except requests.exceptions.RequestException as e:
+#     print(f"下載失敗: {e}")
 
 # 首頁路由
 @app.route('/')
@@ -113,89 +132,131 @@ LABELS = ['apple_pie', 'baby_back_ribs', 'baklava', 'beef_carpaccio', 'beef_tart
           'spring_rolls', 'steak', 'strawberry_shortcake', 'sushi', 'tacos', 'takoyaki',
           'tiramisu', 'tuna_tartare', 'waffles']
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = timm.create_model('swin_base_patch4_window7_224', pretrained=False, num_classes=len(LABELS))
-
-# 修正加載方式
-state_dict = torch.load('swin_model_disb.pth', map_location=device)
-if isinstance(state_dict, dict):
-    state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}  # 去掉分布式訓練的前綴
-    model.load_state_dict(state_dict)
-else:
-    raise ValueError("Loaded model is not a state_dict!")
-
-model.to(device)
-model.eval()  # 切換到推理模式
-print("模型成功加載並轉移到設備")
+    
 
 # 圖片預處理與預測
-def preprocess_image(image_path):
+def preprocess_image(image_path, image_size=224):
     transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
     image = Image.open(image_path).convert("RGB")
-    return transform(image).unsqueeze(0)
+    image = transform(image)
+    return image.unsqueeze(0)  # 增加一個 batch 維度
 
 def predict_image(model, image_path, labels, device):
-    try:
-    # 定義圖片預處理轉換
-        transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
-        # 加載並轉換圖片
-        image = Image.open(image_path).convert("RGB")
-        print(f"圖片 {image_path} 成功加載")  # 確認圖片是否成功加載
-        input_tensor = transform(image).unsqueeze(0).to(device)
-        print(f"圖片張量的形狀: {input_tensor.shape}")  # 確認圖片張量的形狀
+    # 預處理圖片
+    input_tensor = preprocess_image(image_path).to(device)
 
-        #模型預測
-        model.eval()
-        with torch.no_grad():
-            outputs = model(input_tensor)
-            predicted_class = torch.argmax(outputs, dim=1).item()
-        return labels[predicted_class]
+    # 設置模型為評估模式
+    model.eval()
+
+    with torch.no_grad():
+        outputs = model(input_tensor)
+        predicted_class = torch.argmax(outputs, dim=1).item()
+        predicted_label = labels[predicted_class]
+
+    return predicted_label
+
+# 取得專案根目錄的絕對路徑
+BASE_DIR = Path(__file__).resolve().parent
+
+# 修改模型相關設定
+MODEL_CONFIG = {
+    'local_path': BASE_DIR / 'models' / 'swin_model_disb.pth',
+    'cloud_url': "https://weiweihsu-my.sharepoint.com/:u:/g/personal/best_weiweihsu_onmicrosoft_com/EV14Df_TOEpGtp4z7Xh5NrAB7dqUsHUyggBk8sgk4oLgzA?download=1",
+    'chunk_size': 8192
+}
+
+def ensure_model_exists():
+    """確保模型檔案存在，如果不存在則下載"""
+    model_path = Path(MODEL_CONFIG['local_path'])
+    
+    # 建立資料夾（如果不存在）
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    if not model_path.exists():
+        print("模型檔案不存在，開始下載...")
+        download_model()
+    else:
+        print(f"模型檔案已存在於 {model_path}")
+    return str(model_path)
+
+def download_model():
+    """下載模型檔案"""
+    try:
+        response = requests.get(MODEL_CONFIG['cloud_url'], stream=True)
+        response.raise_for_status()
         
+        # 取得檔案總大小
+        total_size = int(response.headers.get('content-length', 0))
+        block_size = MODEL_CONFIG['chunk_size']
+        
+        with open(MODEL_CONFIG['local_path'], 'wb') as f:
+            # 使用 tqdm 建立進度條
+            with tqdm(total=total_size, unit='iB', unit_scale=True) as pbar:
+                for data in response.iter_content(chunk_size=block_size):
+                    size = f.write(data)
+                    pbar.update(size)
+                    
+        print(f"模型檔案已下載至 {MODEL_CONFIG['local_path']}")
     except Exception as e:
-        print(f"圖片處理或預測過程出現錯誤: {e}")
+        print(f"下載失敗: {e}")
         raise
+
+model = None
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def load_model():
+    global model
+    model_path = ensure_model_exists()
+    model = timm.create_model('swin_base_patch4_window7_224', pretrained=False, num_classes=len(LABELS))
+    state_dict = torch.load(model_path, map_location=device)
+    state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval()
+    print("模型成功加載並轉移到設備")
+    
+@app.before_request
+def init():
+    load_model()
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
 
-    image_path = "uploaded_image.jpg"
-    file.save(image_path)
+        image_path = "uploaded_image.jpg"
+        file.save(image_path)
 
-    # 检查文件是否保存成功
-    if not os.path.exists(image_path):
-        print(f"Error: File {image_path} not saved.")
-        return jsonify({'error': 'File not saved successfully'}), 500
+        # 检查文件是否保存成功
+        if not os.path.exists(image_path):
+            print(f"Error: File {image_path} not saved.")
+            return jsonify({'error': 'File not saved successfully'}), 500
 
-    print(f"Image saved at {image_path}, size: {os.path.getsize(image_path)} bytes")
+        print(f"Image saved at {image_path}, size: {os.path.getsize(image_path)} bytes")
 
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        return jsonify({'error': str(e)}), 500
+    
     try:
         # 调用预测函数
         predicted_label = predict_image(model, image_path, LABELS, device)
+        # predicted_label = 'apple_pie'
         print(f"Predicted label: {predicted_label}")
         return jsonify({'swin_prediction': predicted_label})
     except Exception as e:
         logging.error(f"Error during image prediction: {e}")
         return jsonify({'error': str(e)}), 500
 
-    
-    
-
-
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

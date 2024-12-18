@@ -6,4 +6,6 @@ pillow==11.0.0
 torch==2.5.1
 torchvision==0.20.1
 flask_cors==5.0.0
-timm==1.0.12s
+timm==1.0.12
+requests==2.32.3
+tqdm==4.66.2
